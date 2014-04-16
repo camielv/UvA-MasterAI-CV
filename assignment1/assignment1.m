@@ -11,7 +11,12 @@ pcl2 = [1,-1;2, -2]
 
 pcl1rep = repmat(pcl1, [1 1 size(pcl2, 1)]);
 pcl2rep = permute(repmat(pcl2, [1 1 size(pcl1, 1)]), [3 2 1]);
-    
+
+% Compute centroid
+centroid1 = sum(pcl1, 1) / size(pcl1, 1);
+% Create base cloud
+base   = pcl1 - repmat(centroid1, [size(pcl1, 1) 1]);
+
 
 % Data dimension
 d = 4;
@@ -31,14 +36,12 @@ while mean(newdistance) > 0.0012 & counter < 20
     target = pcl2(ids, :);
 
     % Compute centroid
-    centroid1 = sum(pcl1, 1) / size(pcl1, 1);
     centroid2 = sum(target, 1) / size(target, 1);
-    % Move point clouds toward origin
-    pcl1   = pcl1 - repmat(centroid1, [size(pcl1, 1) 1]);
+    % Create target cloud
     target = target - repmat(centroid2, [size(target, 1) 1]);
 
     % Compute A matrix
-    A = pcl1' * target;
+    A = base' * target;
 
     % SVD decomposition
     [U, S, V] = svd(A);
@@ -52,7 +55,7 @@ while mean(newdistance) > 0.0012 & counter < 20
     % Move Target Cloud
     pcl2 = R * pcl2' + repmat(T', [1 size(pcl2,1)]);
     pcl2 = pcl2'
-
+    pcl1
     % Compute new distance
     pcl2rep = permute(repmat(pcl2, [1 1 size(pcl1, 1)]), [3 2 1]);
 
