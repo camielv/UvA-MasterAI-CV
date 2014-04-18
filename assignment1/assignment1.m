@@ -1,4 +1,6 @@
 %% Read PCD
+clear all
+
 baseCloud = readPcd('data/0000000000.pcd');
 otherCloud = readPcd('data/0000000001.pcd');
 
@@ -14,8 +16,9 @@ baseCentroid = computeCentroid(baseCloud);
 baseCloudPrime = translateCloud(baseCloud, -baseCentroid);
 
 % Create target cloud
-[targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud);
-
+tic
+[targetCloud, minima] = computeForClosestCloud(baseCloud, otherCloud);
+toc
 counter = 0;
 while ( mean(minima) > 0.0012 && counter < 20 )
     % Compute centroid
@@ -36,11 +39,12 @@ while ( mean(minima) > 0.0012 && counter < 20 )
     T = baseCentroid - targetCentroid * R
 
     % Move Target Cloud
-    testCloud = (R * otherCloud')'
-    otherCloud = translateCloud((R * otherCloud')', T)
+    otherCloud = translateCloud((R * otherCloud')', T);
     
     % Compute new distance
-    [targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud);
+    [targetCloud, minima] = computeForClosestCloud(baseCloud, otherCloud);
     counter = counter + 1
-    pause
 end
+
+% Save points to file so that we can check and visualize them
+% TODO!!
