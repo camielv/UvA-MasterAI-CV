@@ -2,67 +2,51 @@
 %pcl1 = readPcd('data/0000000000.pcd');
 %pcl2 = readPcd('data/0000000001.pcd');
 
-% Test data
-%pcl1 = [1, 2, 3, 4; 5, 6, 7, 8; 9, 10, 11, 12];
-%pcl2 = [1, 1, 1, 1; 2, 2, 2, 2; 3, 3, 3, 3; 4, 4, 4, 4; 5, 5, 5, 5];
+baseCloud = [1,1;2,2];
+otherCloud = [1,1; cosd(40)+1, sind(40)+1]
 
-pcl1 = [1,1;2,2];
-pcl2 = [1,-1;2, -2]
+d = size(baseCloud, 2);
 
-pcl1rep = repmat(pcl1, [1 1 size(pcl2, 1)]);
-pcl2rep = permute(repmat(pcl2, [1 1 size(pcl1, 1)]), [3 2 1]);
+% Compute base centroid
+baseCentroid = computeCentroid(baseCloud);
 
-% Compute centroid
-centroid1 = sum(pcl1, 1) / size(pcl1, 1);
 % Create base cloud
-base   = pcl1 - repmat(centroid1, [size(pcl1, 1) 1]);
+baseCloudPrime = translateCloud(baseCloud, -baseCentroid);
 
-
-% Data dimension
-d = 4;
-% Rotation Matrix
-R = eye(d);
-% Translation Vector
-t = zeros(1,d);
+% Create target cloud
+[targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud)
 
 counter = 0;
-newdistance = 1;
-while mean(newdistance) > 0.0012 & counter < 20
-    % Compute Euclidean distance
-    distance = sqrt(sum((pcl1rep - pcl2rep).^2, 2));
-    [minima, ids] = min(distance, [], 3);
-
-    % Target cloud
-    target = pcl2(ids, :);
-
+while ( mean(minima) > 0.0012 && counter < 20 )
     % Compute centroid
-    centroid2 = sum(target, 1) / size(target, 1);
+    targetCentroid = computeCentroid(targetCloud);
     % Create target cloud
-    target = target - repmat(centroid2, [size(target, 1) 1]);
+    targetCloudPrime = translateCloud(targetCloud, -targetCentroid);
 
     % Compute A matrix
-    A = base' * target;
+    A = baseCloudPrime' * targetCloudPrime;
 
     % SVD decomposition
     [U, S, V] = svd(A);
 
+    % Fucking determinants that you did not tell me about (Thanks! <3)
+    dsign = sign(det(V*U'));
+    
+    Matrix = eye(d);
+    Matrix(d,d) = dsign;
+    R = V * Matrix * U'
+    R3 = U * V'
     % Rotation Matrix
-    R = U * V';
+    R2 = R * V'
 
     % Translation Matrix
-    T = centroid1 - centroid2 * R;
+    T = baseCentroid - targetCentroid * R
 
     % Move Target Cloud
-    pcl2 = R * pcl2' + repmat(T', [1 size(pcl2,1)]);
-    pcl2 = pcl2'
-    pcl1
+    otherCloud = translateCloud((R * otherCloud')', T)
+    
     % Compute new distance
-    pcl2rep = permute(repmat(pcl2, [1 1 size(pcl1, 1)]), [3 2 1]);
-
-    newdistance = sqrt(sum((pcl1rep - pcl2rep).^2, 2))
-    counter = counter + 1
+    [targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud);
+    counter = counter + 1;
+    pause
 end
-
-%if newdistance < 0.0012
-%    return
-%end
