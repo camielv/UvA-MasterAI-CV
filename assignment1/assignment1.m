@@ -1,9 +1,9 @@
 %% Read PCD
-%pcl1 = readPcd('data/0000000000.pcd');
-%pcl2 = readPcd('data/0000000001.pcd');
+baseCloud = readPcd('data/0000000000.pcd');
+otherCloud = readPcd('data/0000000001.pcd');
 
-baseCloud = [1,1;2,2];
-otherCloud = [1,1; cosd(40)+1, sind(40)+1]
+%baseCloud = [0,0;cosd(45),sind(45)]
+%otherCloud = [0,0; cosd(40), sind(40)];
 
 d = size(baseCloud, 2);
 
@@ -14,7 +14,7 @@ baseCentroid = computeCentroid(baseCloud);
 baseCloudPrime = translateCloud(baseCloud, -baseCentroid);
 
 % Create target cloud
-[targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud)
+[targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud);
 
 counter = 0;
 while ( mean(minima) > 0.0012 && counter < 20 )
@@ -29,24 +29,18 @@ while ( mean(minima) > 0.0012 && counter < 20 )
     % SVD decomposition
     [U, S, V] = svd(A);
 
-    % Fucking determinants that you did not tell me about (Thanks! <3)
-    dsign = sign(det(V*U'));
-    
-    Matrix = eye(d);
-    Matrix(d,d) = dsign;
-    R = V * Matrix * U'
-    R3 = U * V'
     % Rotation Matrix
-    R2 = R * V'
+    R = U * V'
 
     % Translation Matrix
     T = baseCentroid - targetCentroid * R
 
     % Move Target Cloud
+    testCloud = (R * otherCloud')'
     otherCloud = translateCloud((R * otherCloud')', T)
     
     % Compute new distance
     [targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud);
-    counter = counter + 1;
+    counter = counter + 1
     pause
 end
