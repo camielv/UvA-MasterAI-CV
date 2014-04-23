@@ -1,0 +1,91 @@
+\documentclass[11pt,english]{article}
+
+\usepackage{framed}
+\usepackage{fancyvrb}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+
+\author{
+  Camiel Verschoor - \#10017431\\
+  \texttt{Camiel.Verschoor@student.uva.nl}
+  \and
+  Eugenio Bargiacchi - \#10408363\\
+  \texttt{Eugenio.Bargiacchi@student.uva.nl}
+  \and
+  Thomas Jongstra - \#0447536\\
+  \texttt{Thomas.Jongstra@student.uva.nl}
+}
+\title{Computer Vision Lab Assignment Report}
+
+\begin{document}
+\maketitle
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Introduction}
+In this report, we document our approaches and findings of the lab assignments for the Computer Vision course.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Assignment 1}
+
+For this assignment, we were asked to implement the Iterative Closest Point (ICP) algorithm. The goal of this practice was to merge multiple depth-recording pointclouds of an object into a single pointcloud of this object. Below, we will describe the dataset we received for this assignment, as well as our ICP implementation, our method to merge ICP results and a short discussion about ICP itsself.
+
+\subsection*{Dataset}
+For this assignment, we were provided with a dataset, composed out of a 100 consecutive recordings of a person who is rotating against a static background. Each of the recordings yielded the following information, which has been represented in the dataset:
+
+\begin{enumerate}
+\item \textbf{a jpeg file} containing an image of a person
+\item \textbf{a pcd file} containing depth information of the person
+\item \textbf{an xml file} containing camera parameters for the image
+\item \textbf{a png file} containing depth information about the image. In the file, it seems there are three levels of depth information present.
+\item \textbf{a pcd file} with extracted normals of the recorded person
+\item \textbf{a png file} containing a mask of the person in the scene. Upon inspection, this file seems to be directly constructed from the png file containing depth information, though only one of the levels of depth information seems to have been used to construct the mask.
+\end{enumerate}
+
+\noindent
+Upon inspection of the jpeg images, the person seems to have made a 360 degree horizontal rotation during the recording of the 100 recordings, with fairly constant between-image rotations. Hence the rotational difference of the person inbetween each recording is about 360 / 100 = 3.6 degrees.\\
+
+
+\subsection{Iterative Closest Point}
+
+
+\subsection{Merging Scenes}
+
+
+\subsection{ICP Discussion}
+
+\subsubsection{The Drawbacks of ICP}
+ICP does not merge overlapping points when matching two pointclouds. This means matching multiple point clouds will become an increasingly harder matching process (increasinly more points have to be matched every time). Intelligently merging overlapping points would reduce this kind of overhead (so increasing the algorithm's efficiency), while ideally also producing a cleaner end result.
+
+ICP matches points of the basecloud that do not overlap with the target cloud, with the closest points in the target cloud. This is not optimal. Something like a distance threshold could be used to decide which parts of the base cloud should be ignored when computing the total distance between the base cloud and target cloud.
+
+
+\subsubsection{Possible Improvements to ICP}
+ICP does not merge overlapping points when matching two pointclouds. This means matching multiple point clouds will become an increasingly harder matching process (increasinly more points have to be matched every time). Intelligently merging overlapping points would reduce this kind of overhead (so increasing the algorithm's efficiency), while ideally also producing a cleaner end result.
+
+Other idea: create surfaces/meshes out of the points, and match the surfaces of every two point clouds.
+
+Other idea: use the RBG data of points during the matching process by incorporating the RGB difference of points in the distance metric.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Assignment 2}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Assignment 3}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Assignment 4}
+
+\end{document}
