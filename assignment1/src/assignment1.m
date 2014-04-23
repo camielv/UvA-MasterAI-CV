@@ -1,8 +1,12 @@
 %% Read PCD
 clear all
 
-baseCloud = readPcd('data/0000000000.pcd');
-otherCloud = readPcd('data/0000000001.pcd');
+baseCloud = readPcd('../data/0000000000.pcd');
+otherCloud = readPcd('../data/0000000001.pcd');
+
+% Cut hopefully useless 4th dimension
+baseCloud = baseCloud(:, 1:3);
+otherCloud = otherCloud(:, 1:3);
 
 %baseCloud = [0,0;cosd(45),sind(45)]
 %otherCloud = [0,0; cosd(40), sind(40)];
@@ -44,6 +48,7 @@ while ( mean(minima) > 0.0012 && counter < 20 )
     % Compute new distance
     [targetCloud, minima] = computeForClosestCloud(baseCloud, otherCloud);
     counter = counter + 1
+    fflush(stdout)
 end
 
 % Save points to file so that we can check and visualize them
