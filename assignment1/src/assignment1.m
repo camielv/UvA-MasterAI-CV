@@ -40,7 +40,7 @@ while ( mean(minima) > 0.0012 && counter < 20 )
 
     % Move Target Cloud
     otherCloud = translateCloud((R * otherCloud')', T);
-    
+
     % Compute new distance
     [targetCloud, minima] = computeForClosestCloud(baseCloud, otherCloud);
     counter = counter + 1
