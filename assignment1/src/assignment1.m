@@ -3,13 +3,10 @@ clear all
 
 sampleSize = 5000;
 
-fullBaseCloud = readPcd('../data/0000000000.pcd');
-fullOtherCloud = readPcd('../data/0000000001.pcd');
+fullBaseCloud = read3DCloud('../data/0000000000');
+fullOtherCloud = read3DCloud('../data/0000000001');
 
-% Cut hopefully useless 4th dimension
-fullBaseCloud = fullBaseCloud(:, 1:3);
-fullOtherCloud = fullOtherCloud(:, 1:3);
-
+% Pick less stuff since we can't do all data, too slow
 baseCloudIds  = randsample(size(fullBaseCloud,  1), sampleSize);
 baseCloud     = fullBaseCloud(baseCloudIds, :);
 otherCloudIds = randsample(size(fullOtherCloud, 1), sampleSize);
