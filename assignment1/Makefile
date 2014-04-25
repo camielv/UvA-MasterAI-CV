@@ -1,0 +1,12 @@
+all: data/0000000000.pcd
+
+data/0000000000.pcd: data.zip
+	unzip data.zip
+	touch data/0000000000.pcd
+
+data.zip:
+	wget -c https://googledrive.com/host/0BxqEJ5Xwfi63SnlsVkloSVkzdk0 -O data.zip
+
+clean:
+	rm data.zip
+	rm -rf data/

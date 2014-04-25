@@ -34,7 +34,7 @@ while length(line) < 4 | ~strcmp(line(1:4),'DATA')
          end
          nDims = nDims+1;
       end
-   end      
+   end
 
    if length(line) >= 7 && strcmp(line(1:7),'COLUMNS')
       IS_NEW = false;
@@ -68,7 +68,7 @@ if isBinary && IS_NEW
    format = regexp(format,' ','split');
    for i=1:nPts
       for j=1:length(format)
-         if strcmp(format{j},'%d') 
+         if strcmp(format{j},'%d')
             pt = fread(fid,1,'uint32');
          else
             pt = fread(fid,1,'float');
