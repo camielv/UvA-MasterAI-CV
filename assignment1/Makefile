@@ -5,7 +5,7 @@ data/0000000000.pcd: data.zip
 	touch data/0000000000.pcd
 
 data.zip:
-	wget -c https://googledrive.com/host/0BxqEJ5Xwfi63SnlsVkloSVkzdk0 -O data.zip
+	wget -c https://googledrive.com/host/0BxqEJ5Xwfi63SnlsVkloSVkzdk0 --no-check-certificate -O data.zip
 
 clean:
 	rm data.zip
