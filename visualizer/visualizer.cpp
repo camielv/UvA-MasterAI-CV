@@ -20,7 +20,7 @@ int main (int argc, char** argv)
     }
 
     // Visualize PointCloud
-    pcl::visualization::CloudViewer viewer("Eugenio Viewer");
+    pcl::visualization::CloudViewer viewer("Cloud Viewer");
     viewer.showCloud(cloud, "Test");
     while (!viewer.wasStopped())
     {
