@@ -7,12 +7,12 @@ end
 
 
 if nargin < 3
-    sampleSize = 1000;
+    sampleSize = 5000;
 end
 
 % Start and end frame number
 startNr = 0;
-endNr = 1;
+endNr = 10;
 n = endNr - startNr + 1;
 
 % Variable for all clouds
