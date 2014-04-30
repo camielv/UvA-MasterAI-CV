@@ -74,7 +74,7 @@ function savepcd(fname, points, binmode)
         points = permute(points, [2 1 3]);
         points = reshape(points, [], size(points,3))';
     end
-    nfields
+
     switch nfields
         case 3
             fields = 'x y z';
