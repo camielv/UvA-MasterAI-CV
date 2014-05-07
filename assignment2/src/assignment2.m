@@ -2,8 +2,8 @@
 run('~/Tools/vlfeat/toolbox/vl_setup.m');
 
 %% Load images
-image1 = imread('../TeddyBear/obj02_001.png');
-image2 = imread('../TeddyBear/obj02_002.png');
+image1 = imread('../data/TeddyBear/obj02_001.png');
+image2 = imread('../data/TeddyBear/obj02_002.png');
 
 %% Compute SIFT interest points
 % Convert to single precision
