@@ -5,7 +5,7 @@ data/TeddyBear/obj02_001.png: data.zip
 	touch data/TeddyBear/obj02_001.png
 
 data.zip:
-	#wget -c https://googledrive.com/host/0BxqEJ5Xwfi63SnlsVkloSVkzdk0 --no-check-certificate -O data.zip
+	wget -c https://googledrive.com/host/0B066imImC1CgWHB0aXhlUEItX2M --no-check-certificate -O data.zip
 
 clean:
 	rm data.zip
