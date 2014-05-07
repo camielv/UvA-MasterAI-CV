@@ -2,23 +2,76 @@
 run('~/Tools/vlfeat/toolbox/vl_setup.m');
 
 %% Load images
-image1 = imread('../data/TeddyBear/obj02_001.png');
-image2 = imread('../data/TeddyBear/obj02_002.png');
+imageA = imread('../data/TeddyBear/obj02_001.png');
+imageB = imread('../data/TeddyBear/obj02_002.png');
 
 %% Compute SIFT interest points
 % Convert to single precision
-I1 = single(rgb2gray(image1));
-I2 = single(rgb2gray(image2));
+IA = single(rgb2gray(imageA));
+IB = single(rgb2gray(imageB));
 
 % Find interest points
-[F1, D1] = vl_sift(I1);
-[F2, D2] = vl_sift(I2);
+[FA, DA] = vl_sift(IA);
+[FB, DB] = vl_sift(IB);
 
 % Match interest points
-[matches, scores] = vl_ubcmatch(D1, D2);
+[matches, scores] = vl_ubcmatch(DA, DB);
 
-% Compute fundamental matrix
+% TODO: Filter out background features. Background substraction.
 
+%% Compute fundamental matrix
+% TODO: Normalisation function.
+% TODO: Denormalisation function.
+% TODO: RANSAC.
+
+% Convert scores between 0 and 1.
+nScores = scores / max(scores);
+% At the moment no filtering at score
+ids = nScores < 2;
+% Get the filtered matches.
+nMatches = matches(:, ids);
+
+% Extract x and y coordinates for the points that match in both images A
+% and B.
+ptsA = FA(:, nMatches(1, :));
+ptsB = FB(:, nMatches(2, :));
+
+% TODO: Write a normalise function
+% [ptsB, T1] = normalise2dpts(ptsB);
+% [ptsA, T2] = normalise2dpts(ptsA);
+
+ptsAx = ptsA(1, :)';
+ptsBx = ptsB(1, :)';
+ptsAy = ptsA(2, :)';
+ptsBy = ptsB(2, :)';
+
+% See Equation 1 in assignment to constructs matrix A.
+A = [ptsBx .* ptsAx, ptsBx .* ptsAy, ptsBx, ptsBy .* ptsAx, ptsBy .* ptsBy, ptsBy, ptsBx, ptsBy, ones(size(nMatches, 2), 1)];
+
+% Find the SVD of A. Solve Equation 1.
+[U D V] = svd(A, 0);
+
+% The entries of F are the components of the column of V corresponding to
+% the smallest singular value.
+F = reshape(V(:,9),3,3)';
+
+% Find the SVD of F.
+[Uf, Df, Vf] = svd(F,0);
+
+% Set the smallest singular value in the diagonal matrix Df to zero in
+% order to obtain the corrected matrix D f
+Df = diag([D(1,1) D(2,2) 0]);
+
+% Recompute Fundamental Matrix
+F = Uf * Df * Vf';
+
+% TODO: Denormalise
+%F = T2'*F*T1;
+    
+% Solve epipoles?
+%[U,D,V] = svd(F,0);
+%e1 = hnormalise(V(:,3));
+%e2 = hnormalise(U(:,3));
 %% Visualize method 1
 nScores = scores / max(scores);
 ids = nScores < 0.1;
