@@ -16,3 +16,8 @@ The repository should be compiled via:
 To use the library you should run:
 
     run('/VLFEATdir/toolbox/vl_setup.m');
+
+Data
+====
+
+In order to get required data use the Makefile to download and unzip the required data.
