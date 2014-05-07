@@ -49,7 +49,7 @@ while ( error > 0.0012 && counter < maxCounter )
     [U, ~, V] = svd(A);
 
     % Rotation Matrix
-    R = U * V';
+    R = U * V'
 
     % Translation Matrix
     T = baseMatchCentroid - targetCentroid * R;
@@ -74,7 +74,6 @@ end
 
 %plot([1:maxCounter], errors);
 %figure;
-
 
 % Transform result with homogeneous coordinates
 %resultTargetCloud = transformResult * [fullTargetCloud'; ones(1, size(fullTargetCloud, 1))];
