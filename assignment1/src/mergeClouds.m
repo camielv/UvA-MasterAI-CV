@@ -75,6 +75,7 @@ end
 %plot([1:maxCounter], errors);
 %figure;
 
+
 % Transform result with homogeneous coordinates
 %resultTargetCloud = transformResult * [fullTargetCloud'; ones(1, size(fullTargetCloud, 1))];
 % Cut off homogeneous coordinates.
