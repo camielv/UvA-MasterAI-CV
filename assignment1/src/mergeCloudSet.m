@@ -1,18 +1,18 @@
 function [] = mergeCloudSet(filename, sampleSize)
 
 % Default sampleSize value
-if nargin < 2
+if nargin < 1
     filename = 'ihatematlab.pcd';
 end
 
 
-if nargin < 3
+if nargin < 2
     sampleSize = 5000;
 end
 
 % Start and end frame number
 startNr = 0;
-endNr = 10;
+endNr = 9;
 n = endNr - startNr + 1;
 
 % Variable for all clouds
@@ -32,7 +32,7 @@ for i=2:n,
     i
     %H = waitbar(0, ['Adding frame ' num2str(i)]);
     % Get cloud merging results
-    result = mergeClouds(result, cloudIDs{i}, 'random', sampleSize);
+    result = mergeClouds(result, cloudIDs{i}, 'normal', sampleSize);
     % Add cloud merging result to resultCloud
     resultCloud = [resultCloud; result];
     %close(H);

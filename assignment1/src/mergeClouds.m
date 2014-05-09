@@ -43,16 +43,16 @@ while ( error > 0.0012 && counter < maxCounter )
 
     % A Matrix
     %A = baseMatchCloudPrime' * targetCloudPrime
-    A = targetCloudPrime' * baseMatchCloudPrime
+    A = targetCloudPrime' * baseMatchCloudPrime;
     
     % SVD decomposition
     [U, ~, V] = svd(A);
 
     % Rotation Matrix
-    R = U * V'
+    R = U * V';
 
     % Translation Matrix
-    T = baseMatchCentroid - targetCentroid * R
+    T = baseMatchCentroid - targetCentroid * R;
 
     % Accumulate transforms to apply to whole cloud later
     transform = [R T'; zeros(1, size(transformResult, 2) - 1) 1];
