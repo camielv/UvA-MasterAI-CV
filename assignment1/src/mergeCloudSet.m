@@ -1,8 +1,8 @@
-function [ resultCloud ] = mergeCloudSet(cloudSetPath, filename, sampleSize)
+function [] = mergeCloudSet(filename, sampleSize)
 
 % Default sampleSize value
 if nargin < 2
-    filename = 'youarefuckedup.pcd';
+    filename = 'ihatematlab.pcd';
 end
 
 
@@ -23,28 +23,19 @@ for i=1:n,
     cloudIDs{i} = sprintf('%.10d', i-1+startNr);
 end
 
-% Get initial cloud
-baseCloud = readPcd([cloudSetPath, filesep, cloudIDs{1}, '.pcd']);
-% Cut (hopefully useless) 4th dimension
-baseCloud = baseCloud(:, 1:3);
-
 % Result cloud placeholder
-resultCloud = baseCloud;
+resultCloud = readCloud(cloudIDs{1});
+result = resultCloud;
 
 % Loop over all cloud paths
 for i=2:n,
     i
-    % Get other cloud
-    otherCloud = readPcd([cloudSetPath, filesep, cloudIDs{n}, '.pcd']);
-    % Cut (hopefully useless) 4th dimension
-    otherCloud = otherCloud(:, 1:3);
-    
+    %H = waitbar(0, ['Adding frame ' num2str(i)]);
     % Get cloud merging results
-    result = mergeClouds(baseCloud, otherCloud, sampleSize);
+    result = mergeClouds(result, cloudIDs{i}, 'random', sampleSize);
     % Add cloud merging result to resultCloud
     resultCloud = [resultCloud; result];
-    % Set the other cloud as the new baseCloud
-    baseCloud = resultCloud;
+    %close(H);
 end
 
 % Save resultCloud to pcd file

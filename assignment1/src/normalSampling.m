@@ -8,6 +8,7 @@ function [sampledIDs] = normalSampling(cloudName, nSamples, nBins)
     dy = 2/nBinsY;
     dz = 2/nBinsZ;
 
+    % WRONG DOES NOT TAKE INTO ACCOUNT FILTERED POINTS
     normals = readNormals(cloudName);
     
     % Remove invalid normals

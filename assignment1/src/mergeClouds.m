@@ -1,70 +1,85 @@
-function [ resultOtherCloud ] = mergeClouds(fullBaseCloud, fullOtherCloud, sampleSize)
+function [ resultTargetCloud ] = mergeClouds(fullBaseCloud, targetCloudName, sampleMethod, sampleSize)
+
+% Sample part of clouds for point matching
+%[fullBaseCloud, baseCloudIds]   = sample(baseCloudName, 'none', sampleSize);
+%baseCloud      = fullBaseCloud(baseCloudIds, :);
+baseCloud = fullBaseCloud;
+
+[fullTargetCloud, targetCloudIds] = sample(targetCloudName, sampleMethod, sampleSize);
+targetCloud    = fullTargetCloud(targetCloudIds, :);
+ttargetCloud = targetCloud';
+Np = size(ttargetCloud,2);
+Nt = size(fullTargetCloud,1);
 
 % Final transformation matrix to conform otherCloud to coordinate system of
 % baseCloud
 transformResult = eye(size(fullBaseCloud, 2) + 1);
 
-% Sample part of clouds for point matching
-baseCloudIds  = randsample(size(fullBaseCloud,  1), sampleSize);
-baseCloud     = fullBaseCloud(baseCloudIds, :);
-otherCloudIds = randsample(size(fullOtherCloud, 1), sampleSize);
-otherCloud    = fullOtherCloud(otherCloudIds, :);
-
-% Compute base centroid
-baseCentroid = computeCentroid(baseCloud);
-
-% Create base cloud
-baseCloudPrime = translateCloud(baseCloud, -baseCentroid);
-
-% Create target cloud
-[targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud);
+% Init flann
+computeClosestCloud([], baseCloud, 1);
 
 counter = 0;
+maxCounter = 5;
 
-while ( mean(minima) > 0.0012 && counter < 20 )
-    % Compute centroid
+error = 1;
+errors = zeros(1,maxCounter);
+
+TT = zeros(3,1);
+TR = eye(3,3);
+
+while ( error > 0.0012 && counter < maxCounter )
+    %waitbar(counter/50);
+    
+    % COMPUTE BASE MATCH CLOUD, TARGET SELECTS, WE PICK FROM BASECLOUD
+    baseMatchCloud = computeClosestCloud(targetCloud, baseCloud, 0);
+    
+    % SHIFT BASE MATCH TO ORIGIN
+    baseMatchCentroid = computeCentroid(baseMatchCloud);
+    baseMatchCloudPrime = translateCloud(baseMatchCloud, -baseMatchCentroid);
+
+    % SHIFT TARGET TO ORIGIN
     targetCentroid = computeCentroid(targetCloud);
-    % Create target cloud
     targetCloudPrime = translateCloud(targetCloud, -targetCentroid);
 
-    % Compute A matrix
-    A = baseCloudPrime' * targetCloudPrime;
-
+    % A Matrix
+    %A = baseMatchCloudPrime' * targetCloudPrime
+    A = targetCloudPrime' * baseMatchCloudPrime
+    
     % SVD decomposition
     [U, ~, V] = svd(A);
 
     % Rotation Matrix
-    R = U * V';
+    R = U * V'
 
     % Translation Matrix
-    T = baseCentroid - targetCentroid * R;
+    T = baseMatchCentroid - targetCentroid * R
 
-    % Move Target Cloud
-    otherCloud = translateCloud((R * otherCloud')', T);
-    
-    % Transform to homogeneous coordinates to apply transformation to whole
-    % cloud later.
+    % Accumulate transforms to apply to whole cloud later
     transform = [R T'; zeros(1, size(transformResult, 2) - 1) 1];
     transformResult = transform * transformResult;
     
-    % Compute new distance
-    [targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud);
+    TR = R' * TR;
+    TT = R' * TT + T';
+    
+    % MOVE TARGET CLOUD
+    % targetCloud = translateCloud((R * targetCloud')', T);
+    targetCloud = (TR * ttargetCloud + repmat(TT, 1, Np))';
+    
+    % COMPUTE ERROR, DISTANCE BETWEEN NEW TARGET AND OLD MATCH
+    error = mean( sqrt( sum( (baseMatchCloud - targetCloud).^2, 2 )))
+    errors(counter+1) = error;
+
     counter = counter + 1;
 end
 
+%plot([1:maxCounter], errors);
+%figure;
+
 % Transform result with homogeneous coordinates
-resultOtherCloud = transformResult * [fullOtherCloud'; ones(1, size(fullOtherCloud, 1))];
+%resultTargetCloud = transformResult * [fullTargetCloud'; ones(1, size(fullTargetCloud, 1))];
 % Cut off homogeneous coordinates.
-resultOtherCloud = resultOtherCloud(1:size(resultOtherCloud, 1) - 1, :);
-resultOtherCloud = resultOtherCloud';
-%{
-% Old code to test whether it works
-resultOtherCloud = fullOtherCloud;
-total_i = size(rotations, 2)/size(rotations, 1);
-for i = 1:total_i,
-    R = rotations(:, (i - 1) *3 + 1:i * 3);
-    T = translations(i, :);
-    resultOtherCloud = translateCloud((R * resultOtherCloud')', T);
-end
-%}
+%resultTargetCloud = resultTargetCloud(1:size(resultTargetCloud, 1) - 1, :);
+%resultTargetCloud = resultTargetCloud';
+
+resultTargetCloud = (TR * fullTargetCloud' + repmat(TT, 1, Nt))';
 end

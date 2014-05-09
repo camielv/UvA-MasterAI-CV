@@ -3,13 +3,11 @@ clear all
 
 sampleSize = 5000;
 
-fullBaseCloud = read3DCloud('../data/0000000000');
-fullOtherCloud = read3DCloud('../data/0000000001');
+[fullBaseCloud,  baseCloudIds]  = sample('../data/0000000000', 'none', 5000);
+[fullOtherCloud, otherCloudIds] = sample('../data/0000000001', 'none', 5000);
 
 % Pick less stuff since we can't do all data, too slow
-baseCloudIds  = randsample(size(fullBaseCloud,  1), sampleSize);
 baseCloud     = fullBaseCloud(baseCloudIds, :);
-otherCloudIds = randsample(size(fullOtherCloud, 1), sampleSize);
 otherCloud    = fullOtherCloud(otherCloudIds, :);
 
 %baseCloud = [0,0;cosd(45),sind(45)]
@@ -25,7 +23,7 @@ baseCloudPrime = translateCloud(baseCloud, -baseCentroid);
 
 % Create target cloud
 tic
-[targetCloud, minima] = computeForClosestCloud(baseCloud, otherCloud);
+[targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud);
 toc
 counter = 0;
 while ( mean(minima) > 0.0012 && counter < 20 )
@@ -47,11 +45,11 @@ while ( mean(minima) > 0.0012 && counter < 20 )
     T = baseCentroid - targetCentroid * R
 
     % Move Target Cloud
-    fullOtherCloud = translateCloud((R * otherCloud')', T);
-    otherCloud = fullOtherCloud(otherCloudIds);
+    fullOtherCloud = translateCloud((R * fullOtherCloud')', T);
+    otherCloud = fullOtherCloud(otherCloudIds, :);
 
     % Compute new distance
-    [targetCloud, minima] = computeForClosestCloud(baseCloud, otherCloud);
+    [targetCloud, minima] = computeClosestCloud(baseCloud, otherCloud);
     counter = counter + 1
     drawnow('update');
 end
