@@ -1,4 +1,4 @@
-function [ resultTargetCloud ] = mergeClouds(fullBaseCloud, targetCloudName, sampleMethod, sampleSize)
+function [ fullTargetCloud, TR, TT, error ] = mergeClouds(fullBaseCloud, targetCloudName, sampleMethod, sampleSize)
 
 % Sample part of clouds for point matching
 %[fullBaseCloud, baseCloudIds]   = sample(baseCloudName, 'none', sampleSize);
@@ -7,28 +7,25 @@ baseCloud = fullBaseCloud;
 
 [fullTargetCloud, targetCloudIds] = sample(targetCloudName, sampleMethod, sampleSize);
 targetCloud    = fullTargetCloud(targetCloudIds, :);
-ttargetCloud = targetCloud';
-Np = size(ttargetCloud,2);
-Nt = size(fullTargetCloud,1);
 
-% Final transformation matrix to conform otherCloud to coordinate system of
-% baseCloud
-transformResult = eye(size(fullBaseCloud, 2) + 1);
+% Save up initial cloud so that we can move it later.
+originalTargetCloud = targetCloud;
+
+% Total rotation
+TR = eye(3,3);
+% Total translation
+TT = zeros(1,3);
 
 % Init flann
 computeClosestCloud([], baseCloud, 1);
 
+% Init loop variables
 counter = 0;
-maxCounter = 5;
-
+maxCounter = 30;
 error = 1;
-errors = zeros(1,maxCounter);
-
-TT = zeros(3,1);
-TR = eye(3,3);
 
 while ( error > 0.0012 && counter < maxCounter )
-    %waitbar(counter/50);
+    waitbar(counter/maxCounter);
     
     % COMPUTE BASE MATCH CLOUD, TARGET SELECTS, WE PICK FROM BASECLOUD
     baseMatchCloud = computeClosestCloud(targetCloud, baseCloud, 0);
@@ -42,44 +39,28 @@ while ( error > 0.0012 && counter < maxCounter )
     targetCloudPrime = translateCloud(targetCloud, -targetCentroid);
 
     % A Matrix
-    %A = baseMatchCloudPrime' * targetCloudPrime
     A = targetCloudPrime' * baseMatchCloudPrime;
     
     % SVD decomposition
     [U, ~, V] = svd(A);
 
     % Rotation Matrix
-    R = U * V'
+    R = U * V';
 
     % Translation Matrix
     T = baseMatchCentroid - targetCentroid * R;
 
-    % Accumulate transforms to apply to whole cloud later
-    transform = [R T'; zeros(1, size(transformResult, 2) - 1) 1];
-    transformResult = transform * transformResult;
-    
-    TR = R' * TR;
-    TT = R' * TT + T';
-    
-    % MOVE TARGET CLOUD
-    % targetCloud = translateCloud((R * targetCloud')', T);
-    targetCloud = (TR * ttargetCloud + repmat(TT, 1, Np))';
+    % Add Rotation and Translation matrix up
+    TR = TR * R;
+    TT = translateCloud(TT * R, T);
+
+    % Compute new target cloud by moving the original using the final
+    % transformation matrices.
+    targetCloud = translateCloud(originalTargetCloud * TR, TT);
     
     % COMPUTE ERROR, DISTANCE BETWEEN NEW TARGET AND OLD MATCH
-    error = mean( sqrt( sum( (baseMatchCloud - targetCloud).^2, 2 )))
-    errors(counter+1) = error;
+    error = mean( sqrt( sum( (baseMatchCloud - targetCloud).^2, 2 )));
 
     counter = counter + 1;
 end
-
-%plot([1:maxCounter], errors);
-%figure;
-
-% Transform result with homogeneous coordinates
-%resultTargetCloud = transformResult * [fullTargetCloud'; ones(1, size(fullTargetCloud, 1))];
-% Cut off homogeneous coordinates.
-%resultTargetCloud = resultTargetCloud(1:size(resultTargetCloud, 1) - 1, :);
-%resultTargetCloud = resultTargetCloud';
-
-resultTargetCloud = (TR * fullTargetCloud' + repmat(TT, 1, Nt))';
 end

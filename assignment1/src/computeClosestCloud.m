@@ -12,9 +12,9 @@ end
 % Compute sum of squared distance between all points.
 
 % Perfect solution
-[~, ids] = pdist2(extractedCloud, choosingCloud, 'euclidean', 'Smallest', 1);
+%[~, ids] = pdist2(extractedCloud, choosingCloud, 'euclidean', 'Smallest', 1);
 
-%[ids, ~] = flann_search(flannIndex, choosingCloud', 1, struct('checks', 128));
+[ids, ~] = flann_search(flannIndex, choosingCloud', 1, struct('checks', 128));
 
 ids = ids';
 

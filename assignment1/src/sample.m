@@ -1,6 +1,8 @@
 function [cloud, sampledCloudIds] = sample(cloudName, method, sampleSize)
     
-    cloud = readCloud(cloudName);
+    % The original IDs are kept for normal sampling because we need to 
+    % discard the normals for the points we have discarded already.
+    [cloud originalIDs] = readCloud(cloudName, true);
     
     if strcmp(method, 'none')
         sampledCloudIds = 1:size(cloud,1);
@@ -9,7 +11,7 @@ function [cloud, sampledCloudIds] = sample(cloudName, method, sampleSize)
         sampledCloudIds = randsample(size(cloud,  1), sampleSize);
         return
     elseif strcmp(method, 'normal')
-        sampledCloudIds = normalSampling(cloudName, sampleSize, 100);
+        sampledCloudIds = normalSampling(cloudName, originalIDs, sampleSize, 100);
         return
     else
         throw('sampling method unknown');

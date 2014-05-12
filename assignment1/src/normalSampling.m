@@ -1,4 +1,4 @@
-function [sampledIDs] = normalSampling(cloudName, nSamples, nBins)
+function [sampledIDs] = normalSampling(cloudName, originalIDs, nSamples, nBins)
     nBinsX = round(nBins^(1/3));
     nBinsY = nBinsX;
     nBinsZ = nBinsX;
@@ -8,8 +8,7 @@ function [sampledIDs] = normalSampling(cloudName, nSamples, nBins)
     dy = 2/nBinsY;
     dz = 2/nBinsZ;
 
-    % WRONG DOES NOT TAKE INTO ACCOUNT FILTERED POINTS
-    normals = readNormals(cloudName);
+    normals = readNormals(cloudName, originalIDs);
     
     % Remove invalid normals
     normalIDs = ~any(isnan(normals),2);
