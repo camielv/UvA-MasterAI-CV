@@ -33,7 +33,7 @@ pointsA = FA(:, nMatches(1, :));
 pointsB = FB(:, nMatches(2, :));
 
 %% Find the fundamental matrix
-F = eightPoint(pointsA(1:3, :), pointsB(1:3, :));
+F = ransac(pointsA(1:3, :), pointsB(1:3, :));
 %% a
 % TODO: Write a normalise function
 % [ptsB, T1] = normalise2dpts(ptsB);
