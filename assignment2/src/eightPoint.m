@@ -7,11 +7,7 @@
 % Returns:
 % F                - Fundamental matrix
 
-function [F] = findFundamentalMatrix(pointsA, pointsB, ransac)
-    if nargin < 3,
-        ransac = 0;
-    end
-
+function [F] = eightPoint(pointsA, pointsB)
     % Number of point correspondences
     n = size(pointsA, 2);
     
@@ -25,13 +21,7 @@ function [F] = findFundamentalMatrix(pointsA, pointsB, ransac)
     Ay = pointsA(2, :)';
     By = pointsB(2, :)';
 
-
-    if ransac,
-        % Apply ransac
-    else
-        % See Equation 1 in assignment to constructs matrix A.
-        A = [Bx .* Ax, Bx .* Ay, Bx, By .* Ax, By .* By, By, Bx, By, ones(n, 1)];
-    end
+    A = [Bx .* Ax, Bx .* Ay, Bx, By .* Ax, By .* By, By, Bx, By, ones(n, 1)];
 
     % Find the SVD of A. Solve Equation 1.
     [U D V] = svd(A, 0);

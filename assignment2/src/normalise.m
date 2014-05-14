@@ -22,9 +22,10 @@ function [normalizedPoints, T] = normalise(points)
     end
 
     % Ensure homogeneous coordinates have scale 1
-    points(1, finiteIDs) = points(1, finiteIDs) ./ points(3, finiteIDs);
-    points(2, finiteIDs) = points(2, finiteIDs) ./ points(3, finiteIDs);
-    points(3, finiteIDs) = 1;
+    % Not sure this has to be in?
+    %points(1, finiteIDs) = points(1, finiteIDs) ./ points(3, finiteIDs);
+    %points(2, finiteIDs) = points(2, finiteIDs) ./ points(3, finiteIDs);
+    %points(3, finiteIDs) = 1;
     
     % Centroid of finite points
     centroid = mean(points(1:2, finiteIDs)')';
@@ -35,13 +36,16 @@ function [normalizedPoints, T] = normalise(points)
     
     % Compute distance
     distance = sqrt( newPoints(1, finiteIDs).^2 + newPoints(2, finiteIDs).^2);
-    meanDistance = mean(distance(:));
+        meanDistance = mean(distance(:));
     
+    % Compute scale
     scale = sqrt(2) / meanDistance;
     
+    % Compute transformation matrix
     T = [scale   0   -scale*centroid(1);
          0     scale -scale*centroid(2);
          0       0           1];
-     
-     normalizedPoints = T * points;
+    
+    % Normalize points
+    normalizedPoints = T * points;
 end
