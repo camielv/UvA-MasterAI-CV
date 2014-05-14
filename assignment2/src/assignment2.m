@@ -5,7 +5,7 @@ run('~/Tools/vlfeat/toolbox/vl_setup.m');
 imageA = imread('../data/TeddyBear/obj02_001.png');
 imageB = imread('../data/TeddyBear/obj02_002.png');
 
-%% Compute SIFT interest points
+%% Compute SIFT interest points and match them
 % Convert to single precision
 IA = single(rgb2gray(imageA));
 IB = single(rgb2gray(imageB));
@@ -20,10 +20,6 @@ IB = single(rgb2gray(imageB));
 % TODO: Filter out background features. Background substraction.
 
 %% Compute fundamental matrix
-% TODO: Normalisation function.
-% TODO: Denormalisation function.
-% TODO: RANSAC.
-
 % Convert scores between 0 and 1.
 nScores = scores / max(scores);
 % At the moment no filtering at score
@@ -33,9 +29,12 @@ nMatches = matches(:, ids);
 
 % Extract x and y coordinates for the points that match in both images A
 % and B.
-ptsA = FA(:, nMatches(1, :));
-ptsB = FB(:, nMatches(2, :));
+pointsA = FA(:, nMatches(1, :));
+pointsB = FB(:, nMatches(2, :));
 
+% Find the fundamental matrix
+F = findFundamentalMatrix(pointsA(1:3, :), pointsB(1:3, :), 0);
+%% a
 % TODO: Write a normalise function
 % [ptsB, T1] = normalise2dpts(ptsB);
 % [ptsA, T2] = normalise2dpts(ptsA);
