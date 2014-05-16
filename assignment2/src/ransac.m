@@ -34,20 +34,26 @@ function [F, bestModel] = ransac(pointsA, pointsB, t, N)
         % Select eight random points
         ids = ceil(rand(8, 1) * size(pointsA, 2));
         
+        % Find fundamental matrix
         Ft = eightPoint(pointsA(:, ids), pointsB(:, ids));
         
+        % Compute errors B' * F * A
         BFtA = zeros(1, size(nPointsA, 2));
         for i=1:n,
             BFtA(i) = nPointsB(:, i)' * Ft * nPointsA(:, i);
         end
-        
+        max(BFtA)
+        mean(BFtA)
+        % Compute distances
         FtA = Ft * nPointsA;
         FtB = Ft' * nPointsB;
         
         distance = BFtA.^2 ./ (FtA(1, :).^2 + FtA(2, :).^2 + FtB(1, :).^2 + FtB(1, :).^2);
         
+        % Compute inliers
         inliers = find(abs(distance) < t);
         
+        % Check if more inliers
         if length(inliers) > bestScore,
             bestScore = length(inliers);
             bestModel = inliers;

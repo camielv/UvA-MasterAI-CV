@@ -5,6 +5,24 @@ run('~/Tools/vlfeat/toolbox/vl_setup.m');
 imageA = imread('../data/TeddyBear/obj02_001.png');
 imageB = imread('../data/TeddyBear/obj02_002.png');
 
+%% Background removal
+backgroundA = imageB - imageA;
+backgroundB = imageA - imageB;
+G = fspecial('gaussian',[25 25], 25);
+blurA = imfilter(backgroundA, G, 'same');
+blurB = imfilter(backgroundB, G, 'same');
+blurA = sum(blurA, 3);
+blurB = sum(blurB, 3);
+%blurA = blurA ./ max(max(blurA));
+%blurB = blurB ./ max(max(blurB));
+%%
+threshold = 50;
+filterA = blurA > threshold;
+filterB = blurB > threshold;
+maskA = bwconvhull(filterA);
+maskB = bwconvhull(filterB);
+imageA = imageA .* repmat(uint8(maskA), [1, 1, 3]);
+imageB = imageB .* repmat(uint8(maskB), [1, 1, 3]);
 %% Compute SIFT interest points and match them
 % Convert to single precision
 IA = single(rgb2gray(imageA));
@@ -34,58 +52,21 @@ pointsB = FB(:, nMatches(2, :));
 
 %% Find the fundamental matrix
 F = ransac(pointsA(1:3, :), pointsB(1:3, :));
-%% a
-% TODO: Write a normalise function
-% [ptsB, T1] = normalise2dpts(ptsB);
-% [ptsA, T2] = normalise2dpts(ptsA);
-
-ptsAx = ptsA(1, :)';
-ptsBx = ptsB(1, :)';
-ptsAy = ptsA(2, :)';
-ptsBy = ptsB(2, :)';
-
-% See Equation 1 in assignment to constructs matrix A.
-A = [ptsBx .* ptsAx, ptsBx .* ptsAy, ptsBx, ptsBy .* ptsAx, ptsBy .* ptsBy, ptsBy, ptsBx, ptsBy, ones(size(nMatches, 2), 1)];
-
-% Find the SVD of A. Solve Equation 1.
-[U D V] = svd(A, 0);
-
-% The entries of F are the components of the column of V corresponding to
-% the smallest singular value.
-F = reshape(V(:,9),3,3)';
-
-% Find the SVD of F.
-[Uf, Df, Vf] = svd(F,0);
-
-% Set the smallest singular value in the diagonal matrix Df to zero in
-% order to obtain the corrected matrix D f
-Df = diag([D(1,1) D(2,2) 0]);
-
-% Recompute Fundamental Matrix
-F = Uf * Df * Vf';
-
-% TODO: Denormalise
-%F = T2'*F*T1;
-    
-% Solve epipoles?
-%[U,D,V] = svd(F,0);
-%e1 = hnormalise(V(:,3));
-%e2 = hnormalise(U(:,3));
 %% Visualize method 1
 nScores = scores / max(scores);
 ids = nScores < 0.1;
 nMatches = matches(:, ids);
 
-result = [image1 image2];
+result = [imageA imageB];
 figure(1); clf;
 imshow(result);
 hold on;
 
 % Create x and y coordinates for matches a and b.
-xa = F1(1, nMatches(1,:));
-xb = F2(1, nMatches(2,:)) + size(I1,2);
-ya = F1(2, nMatches(1,:));
-yb = F2(2, nMatches(2,:));
+xa = FA(1, nMatches(1,:));
+xb = FB(1, nMatches(2,:)) + size(IA,2);
+ya = FA(2, nMatches(1,:));
+yb = FB(2, nMatches(2,:));
 scatter(xa, ya);
 scatter(xb, yb);
 

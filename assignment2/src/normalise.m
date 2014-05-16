@@ -28,7 +28,7 @@ function [normalizedPoints, T] = normalise(points)
     %points(3, finiteIDs) = 1;
     
     % Centroid of finite points
-    centroid = mean(points(1:2, finiteIDs)')';
+    centroid = mean(points(1:2, finiteIDs), 2);
     
     % Shift origin to centroid 
     newPoints(1, finiteIDs) = points(1, finiteIDs) - centroid(1);

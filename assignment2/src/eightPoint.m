@@ -8,10 +8,10 @@
 % F                - Fundamental matrix
 
 function [F] = eightPoint(pointsA, pointsB)
-    % Number of point correspondences
+    % Number of point correspondences.
     n = size(pointsA, 2);
     
-    % Normalise points
+    % Normalise points.
     [pointsA, TA] = normalise(pointsA);
     [pointsB, TB] = normalise(pointsB);
     
@@ -20,7 +20,8 @@ function [F] = eightPoint(pointsA, pointsB)
     Bx = pointsB(1, :)';
     Ay = pointsA(2, :)';
     By = pointsB(2, :)';
-
+    
+    % Construct matrix A.
     A = [Bx .* Ax, Bx .* Ay, Bx, By .* Ax, By .* By, By, Bx, By, ones(n, 1)];
 
     % Find the SVD of A. Solve Equation 1.
@@ -40,5 +41,6 @@ function [F] = eightPoint(pointsA, pointsB)
     % Recompute Fundamental Matrix
     F = Uf * Df * Vf';
 
+    % Denormalise Fundamental Matrix
     F = TB' * F * TA;
 end
