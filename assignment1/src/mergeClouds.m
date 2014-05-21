@@ -1,9 +1,15 @@
-function [ fullTargetCloud, TR, TT, error ] = mergeClouds(fullBaseCloud, targetCloudName, sampleMethod, sampleSize)
-
-% Sample part of clouds for point matching
-%[fullBaseCloud, baseCloudIds]   = sample(baseCloudName, 'none', sampleSize);
-%baseCloud      = fullBaseCloud(baseCloudIds, :);
-baseCloud = fullBaseCloud;
+function [ fullTargetCloud, TR, TT, error ] = mergeClouds(baseCloud, targetCloudName, sampleMethod, sampleSize, matchMethod)
+% MERGECLOUDS Load a cloud and compute transforms to match other cloud.
+%    [ LOADEDCLOUD, TR, TT, ERROR ] = MERGECLOUDS( BASECLOUD, CLOUDNAME,
+%    SAMPLEMETHOD, SAMPLESIZE, MATCHMETHOD) loads the cloud identified by
+%    CLOUDNAME, and computes the rotation matrix TR and translation matrix
+%    TT needed to match it to BASECLOUD with error ERROR. SAMPLEMETHOD
+%    identifies the method used to sample points from the loaded cloud for
+%    the matching (BASECLOUD is not sampled). SAMPLEMETHOD can be 'none',
+%    'random' or 'normal'. SAMPLESIZE is the number of samples that the
+%    SAMPLEMETHOD should return, and has no effect if SAMPLEMETHOD is
+%    'none'. MATCHMETHOD can be either 'brute' or 'flann' and determines
+%    how we find the closest points.
 
 [fullTargetCloud, targetCloudIds] = sample(targetCloudName, sampleMethod, sampleSize);
 targetCloud    = fullTargetCloud(targetCloudIds, :);
@@ -16,19 +22,29 @@ TR = eye(3,3);
 % Total translation
 TT = zeros(1,3);
 
-% Init flann
-computeClosestCloud([], baseCloud, 1);
+% Init flann if needed
+computeClosestCloud([], baseCloud, matchMethod, 1);
 
 % Init loop variables
 counter = 0;
-maxCounter = 30;
+if strcmp(matchMethod, 'flann')
+    maxCounter = 30;
+else
+    maxCounter = 10;
+end
 error = 1;
 
 while ( error > 0.0012 && counter < maxCounter )
     waitbar(counter/maxCounter);
     
     % COMPUTE BASE MATCH CLOUD, TARGET SELECTS, WE PICK FROM BASECLOUD
-    baseMatchCloud = computeClosestCloud(targetCloud, baseCloud, 0);
+    baseMatchCloud = computeClosestCloud(targetCloud, baseCloud, matchMethod, 0);
+    
+    % DISCARD TOO FAR AWAY POINTS
+    % distances = sqrt( sum( (baseMatchCloud - targetCloud).^2, 2 ));
+    % ids = distances < 0.0100;
+    % leanBaseMatchCloud = baseMatchCloud(ids, :);
+    % targetCloud = targetCloud(ids, :);
     
     % SHIFT BASE MATCH TO ORIGIN
     baseMatchCentroid = computeCentroid(baseMatchCloud);

@@ -1,20 +1,22 @@
-function [closestCloud] = computeClosestCloud(choosingCloud, extractedCloud, resetFlann)
-% To use this part you need to add flann to your path!!
+function [closestCloud] = computeClosestCloud(choosingCloud, extractedCloud, method, resetFlann)
+
 persistent flannIndex;
 if resetFlann
-    if ~isempty(flannIndex)
-        flann_free_index(flannIndex);
+    if strcmp(method,'flann')
+        if ~isempty(flannIndex)
+            flann_free_index(flannIndex);
+        end
+        flannIndex = flann_build_index(extractedCloud', struct('algorithm', 'kdtree', 'trees', 8));
     end
-    flannIndex = flann_build_index(extractedCloud', struct('algorithm', 'kdtree', 'trees', 8));
     return
 end
 
-% Compute sum of squared distance between all points.
-
-% Perfect solution
-%[~, ids] = pdist2(extractedCloud, choosingCloud, 'euclidean', 'Smallest', 1);
-
-[ids, ~] = flann_search(flannIndex, choosingCloud', 1, struct('checks', 128));
+% Compute ids of closest points
+if strcmp(method, 'flann')
+    [ids, ~] = flann_search(flannIndex, choosingCloud', 1, struct('checks', 128));
+else
+    [~, ids] = pdist2(extractedCloud, choosingCloud, 'euclidean', 'Smallest', 1);
+end
 
 ids = ids';
 

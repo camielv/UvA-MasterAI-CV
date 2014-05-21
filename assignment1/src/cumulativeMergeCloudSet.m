@@ -1,4 +1,4 @@
-function [resultCloud, TRarr, TTarr] = mergeCloudSet(filename, sampleMethod, sampleSize, matchMethod, startNr, stepNr, endNr)
+function [resultCloud] = cumulativeMergeCloudSet(filename, sampleMethod, sampleSize, matchMethod, startNr, stepNr, endNr)
 % MERGECLOUDSET Load and merge point cloud datasets
 %    [ALLCLOUDS, TRARR, TTARR] = MERGECLOUDSET(FILENAME, SAMPLEMETHOD,
 %    SAMPLESIZE, MATCHMETHOD, START, STEP, END) loads point cloud datasets
@@ -8,7 +8,7 @@ function [resultCloud, TRarr, TTarr] = mergeCloudSet(filename, sampleMethod, sam
 %    ALLCLOUDS and the rotation and translation matrices TRARR and TTARR
 %    used in the process. SAMPLEMETHOD and SAMPLESIZE are parameters used
 %    for the merging of individual clouds. SAMPLEMETHOD can be either
-%    'none', 'random' or 'normal'. If it is not 'none', then SAMPLESIZE
+%    'none', 'random' (not 'normal'). If it is not 'none', then SAMPLESIZE
 %    identifies the number of samples that are extracted. MATCHMETHOD can
 %    be either 'brute' or 'flann' and determines how we look for close
 %    points.
@@ -19,7 +19,7 @@ if nargin < 1
 end
 
 if nargin < 2
-    sampleMethod = 'normal';
+    sampleMethod = 'random';
 end
 
 if nargin < 3
@@ -47,34 +47,24 @@ for i=1:n,
     cloudIDs{i} = sprintf('%.10d', frameIDs(i));
 end
 
-% Init memory
-resultCloud = cell(1,n);
-TRarr = zeros(3, 3, n);
-TTarr = zeros(1, 3, n);
-
-% Here we hold all clouds while we wait for rotate/translate them.
-resultCloud{1} = readCloud(cloudIDs{1}, true);
+% Here we hold all clouds
+resultCloud = readCloud(cloudIDs{1}, true);
 
 % Loop over all cloud paths
 for i=2:n,
     frameIDs(i)
-    % Get cloud merging results
-    [resultCloud{i}, TRarr(:, :, i), TTarr(:, :, i), error] = mergeClouds(resultCloud{i-1}, cloudIDs{i}, sampleMethod, sampleSize, matchMethod);
+    [newCloud, TR, TT, error] = mergeClouds(resultCloud, cloudIDs{i}, sampleMethod, sampleSize, matchMethod);
+    % The following is not exactly super-efficient since we move lots of
+    % points at every iteration, but it is easier than changing all the
+    % functions. We reverse-rotate the big cloud and then add the new
+    % cloud.
+    resultCloud = translateCloud( resultCloud / TR, -TT );
+    resultCloud = [resultCloud ; newCloud ];
+    
     disp(error);
 end
 
-% Finally merge everything
-result = [];
-TR = eye(3,3);
-TT = zeros(1,3);
-for i=1:n-1
-    result = [result; translateCloud(resultCloud{i} * TR, TT)];
-    TR = TRarr(:, :, i+1) * TR;
-    TT = translateCloud(TTarr(:, :, i+1) * TR, TT);
-end
-result = [result; translateCloud(resultCloud{n} * TR, TT)];
-
-resultIDs = randsample(size(result,  1), sampleSize * n);
+resultIDs = randsample(size(resultCloud,  1), sampleSize * n);
 % Save resultCloud to pcd file
-savepcd(filename, result(resultIDs,:)');
+savepcd(filename, resultCloud(resultIDs,:)');
 end

@@ -4,7 +4,7 @@ function [cloud, indexes] = readCloud(cloudName, filter)
     cloud = cloud(:, 1:3);
     
     if filter == true
-        indexes = all(cloud'<2);
+        indexes = all(cloud'<1);
         cloud = cloud(indexes,:);
     else
         indexes = 1:size(cloud,1);
