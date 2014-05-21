@@ -2,31 +2,16 @@
 run('~/Tools/vlfeat/toolbox/vl_setup.m');
 
 %% Load images
-imageA = imread('../data/TeddyBear/obj02_001.png');
-imageB = imread('../data/TeddyBear/obj02_002.png');
+imageA = imread('../data/TeddyBear/obj02_002.png');
+imageB = imread('../data/TeddyBear/obj02_003.png');
 
 %% Background removal
-backgroundA = imageB - imageA;
-backgroundB = imageA - imageB;
-G = fspecial('gaussian',[25 25], 25);
-blurA = imfilter(backgroundA, G, 'same');
-blurB = imfilter(backgroundB, G, 'same');
-blurA = sum(blurA, 3);
-blurB = sum(blurB, 3);
-%blurA = blurA ./ max(max(blurA));
-%blurB = blurB ./ max(max(blurB));
-%%
-threshold = 50;
-filterA = blurA > threshold;
-filterB = blurB > threshold;
-maskA = bwconvhull(filterA);
-maskB = bwconvhull(filterB);
-imageA = imageA .* repmat(uint8(maskA), [1, 1, 3]);
-imageB = imageB .* repmat(uint8(maskB), [1, 1, 3]);
+[objectA, objectB] = removeBackground(imageA, imageB);
+
 %% Compute SIFT interest points and match them
 % Convert to single precision
-IA = single(rgb2gray(imageA));
-IB = single(rgb2gray(imageB));
+IA = single(rgb2gray(objectA));
+IB = single(rgb2gray(objectB));
 
 % Find interest points
 [FA, DA] = vl_sift(IA);
@@ -52,6 +37,13 @@ pointsB = FB(:, nMatches(2, :));
 
 %% Find the fundamental matrix
 F = ransac(pointsA(1:3, :), pointsB(1:3, :));
+
+%% Check error
+error = 0;
+for i = 1:size(pointsA, 2),
+    error = error + (pointsB(1:3, i)' * Fa * pointsA(1:3, i));
+end
+error
 %% Visualize method 1
 nScores = scores / max(scores);
 ids = nScores < 0.1;

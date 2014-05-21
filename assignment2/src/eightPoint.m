@@ -22,8 +22,9 @@ function [F] = eightPoint(pointsA, pointsB)
     By = pointsB(2, :)';
     
     % Construct matrix A.
-    A = [Bx .* Ax, Bx .* Ay, Bx, By .* Ax, By .* By, By, Bx, By, ones(n, 1)];
-
+    %A = [Ax .* Bx, Ax .* By, Ax, Ay .* Bx, Ay .* By, Ay, Bx, By, ones(n, 1)];
+    A = [Ax.*Bx, Ay.*Bx, Bx, Ax.*By, Ay.*By, By, Ax, Ay, ones(n, 1)];
+    
     % Find the SVD of A. Solve Equation 1.
     [U D V] = svd(A, 0);
 

@@ -13,7 +13,7 @@
 
 function [F, bestModel] = ransac(pointsA, pointsB, t, N)
     if nargin < 3,
-        t = 0.001;
+        t = 1;
     end
     if nargin < 4,
         N = 10000;
@@ -27,26 +27,24 @@ function [F, bestModel] = ransac(pointsA, pointsB, t, N)
     bestModel = [];
 
     % Normalize points
-    [nPointsA, TA] = normalise(pointsA);
-    [nPointsB, TB] = normalise(pointsB);
+    %[nPointsA, TA] = normalise(pointsA);
+    %[nPointsB, TB] = normalise(pointsB);
     
     for i=0:N,
         % Select eight random points
         ids = ceil(rand(8, 1) * size(pointsA, 2));
         
         % Find fundamental matrix
-        Ft = eightPoint(pointsA(:, ids), pointsB(:, ids));
+        Ft = eightpoint(pointsA(:, ids), pointsB(:, ids));
         
         % Compute errors B' * F * A
-        BFtA = zeros(1, size(nPointsA, 2));
+        BFtA = zeros(1, size(pointsA, 2));
         for i=1:n,
-            BFtA(i) = nPointsB(:, i)' * Ft * nPointsA(:, i);
+            BFtA(i) = pointsB(:, i)' * Ft * pointsA(:, i);
         end
-        max(BFtA)
-        mean(BFtA)
         % Compute distances
-        FtA = Ft * nPointsA;
-        FtB = Ft' * nPointsB;
+        FtA = Ft * pointsA;
+        FtB = Ft' * pointsB;
         
         distance = BFtA.^2 ./ (FtA(1, :).^2 + FtA(2, :).^2 + FtB(1, :).^2 + FtB(1, :).^2);
         
