@@ -13,7 +13,7 @@
 
 function [F, bestModel] = ransac(pointsA, pointsB, t, N)
     if nargin < 3,
-        t = 1;
+        t = 10;
     end
     if nargin < 4,
         N = 10000;

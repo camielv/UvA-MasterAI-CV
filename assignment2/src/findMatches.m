@@ -5,11 +5,20 @@
 %
 % Arguments:
 % imageA, imageB   - Two images.
+% t                - Threshold for ransac.
+% N                - Number of iterations for ransac.
 %
 % Returns:
 % pointsA, pointsB - Two sets 3xN of corresponding homogeneous points.
+% F                - Fundamental matrix
 
-function [pointsA pointsB] = findMatches(imageA, imageB)
+function [pointsA pointsB, F] = findMatches(imageA, imageB, t, N)
+    if nargin < 3,
+        t = 10;
+    end
+    if nargin < 4,
+        N = 10000;
+    end
     % Remove background
     [imageA, imageB] = removeBackground(imageA, imageB);
     imageA = single(rgb2gray(imageA));
@@ -25,8 +34,8 @@ function [pointsA pointsB] = findMatches(imageA, imageB)
     pointsA = FA(1:3, matches(1, :));
     pointsB = FB(1:3, matches(2, :));
     
-    [F, model] = ransac(pointsA, pointsB);
+    [F, model] = ransac(pointsA, pointsB, t, N);
     
-    pointsA = pointsA(model, :);
-    pointsB = pointsB(model, :);
+    pointsA = pointsA(:, model);
+    pointsB = pointsB(:, model);
 end
