@@ -54,7 +54,7 @@ function [F, bestModel] = ransac(pointsA, pointsB, t, N)
         if length(inliers) > bestScore,
             bestScore = length(inliers);
             bestModel = inliers;
-            fprintf('Inliers:  %d\nOutliers: %d\n', bestScore, n - bestScore);
+            %fprintf('Inliers:  %d\nOutliers: %d\n', bestScore, n - bestScore);
         end
     end
     fprintf('N. Inliers:  %d\n', bestScore);
