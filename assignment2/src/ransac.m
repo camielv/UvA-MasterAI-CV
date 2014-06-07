@@ -18,10 +18,10 @@ function [F, bestModel] = ransac(pointsA, pointsB, t, N)
     if nargin < 4,
         N = 10000;
     end
-    
+
     % Size
     n = size(pointsA, 2);
-    
+
     % Best score
     bestScore = 0;
     bestModel = [];
@@ -29,37 +29,36 @@ function [F, bestModel] = ransac(pointsA, pointsB, t, N)
     % Normalize points
     %[nPointsA, TA] = normalise(pointsA);
     %[nPointsB, TB] = normalise(pointsB);
-    
+    x = 0;
+
     for i=0:N,
         % Select eight random points
-        ids = ceil(rand(8, 1) * size(pointsA, 2));
-        
+        ids = randsample(n, 8);
+
         % Find fundamental matrix
-        Ft = eightpoint(pointsA(:, ids), pointsB(:, ids));
-        
+        Ft = eightPoint(pointsA(:, ids), pointsB(:, ids));
+
         % Compute errors B' * F * A
-        BFtA = zeros(1, size(pointsA, 2));
-        for i=1:n,
-            BFtA(i) = pointsB(:, i)' * Ft * pointsA(:, i);
-        end
+        BFtA = sum((pointsB' * Ft).*pointsA', 2)';
+
         % Compute distances
         FtA = Ft * pointsA;
         FtB = Ft' * pointsB;
-        
+
         distance = BFtA.^2 ./ (FtA(1, :).^2 + FtA(2, :).^2 + FtB(1, :).^2 + FtB(1, :).^2);
-        
+
         % Compute inliers
-        inliers = find(abs(distance) < t);
-        
+        inliers = find(distance < t);
+
         % Check if more inliers
         if length(inliers) > bestScore,
             bestScore = length(inliers);
             bestModel = inliers;
-            fprintf('Inliers:  %d\nOutliers: %d\n', bestScore, size(pointsA, 2) - bestScore);
+            fprintf('Inliers:  %d\nOutliers: %d\n', bestScore, n - bestScore);
         end
     end
     fprintf('N. Inliers:  %d\n', bestScore);
-    fprintf('N. Outliers: %d\n', size(pointsA, 2) - bestScore);
+    fprintf('N. Outliers: %d\n', n - bestScore);
 
     % Reestimate F based on the inliers of the best model only
     F = eightPoint(pointsA(:, bestModel), pointsB(:, bestModel));
