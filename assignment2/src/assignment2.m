@@ -57,6 +57,4 @@ yb = pointsB(2,:);% FB(2, nMatches(2,:));
 scatter(xa, ya);
 scatter(xb, yb);
 
-for i=1:size(xa, 2);
-    plot([xa(:, i), xb(:, i)], [ya(:, i), yb(:, i)]);
-end
+plot([xa;xb], [ya;yb]);
