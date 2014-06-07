@@ -7,6 +7,7 @@ data/0000000000.pcd: data.zip
 data.zip:
 	wget -c https://googledrive.com/host/0BxqEJ5Xwfi63SnlsVkloSVkzdk0 --no-check-certificate -O data.zip
 
+.PHONY: clean
 clean:
 	rm data.zip
 	rm -rf data/
