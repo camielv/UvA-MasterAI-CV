@@ -30,5 +30,5 @@ function [imageA] = removeBackground(imageA, imageB, threshold)
     maskA = bwconvhull(filterA);
     
     % Final image
-    imageA = imageA .* repmat(uint8(maskA), [1, 1, 3]);
+    imageA = imageA .* repmat(uint8(maskA), [1, 1]);
 end
