@@ -1,7 +1,7 @@
 % This function gives back points that appear in x consecutive frames
 %
 %
-function [Z] = chaining(path, t, N)
+function [Z] = chaining(path, rt, N, bt, noLoop)
     filenames = getFilenames(path);
     nFiles = size(filenames, 2);
     
@@ -9,22 +9,22 @@ function [Z] = chaining(path, t, N)
 
     imageA = loadGrayImage(filenames{1});
     imageB = loadGrayImage(filenames{2});
-    [imageAcut] = removeBackground(imageA, imageB);
+    [imageAcut] = removeBackground(imageA, imageB, bt);
     imageAcut = single(imageAcut);
     [FA, DA] = vl_sift(imageAcut);
     
-    for i = 1 : nFiles,
+    for i = 1 : nFiles - noLoop,
         imageB = loadGrayImage(filenames{mod(i, nFiles) + 1});
         
         % Remove background
-        [imageBcut] = removeBackground(imageB, imageA);
+        [imageBcut] = removeBackground(imageB, imageA, bt);
         imageBcut = single(imageBcut);
     
         % Compute SIFT features
         [FB, DB] = vl_sift(imageBcut);
         
         % Find features
-        [pointsA, pointsB] = findMatches(FA, FB, DA, DB, t, N);
+        [pointsA, pointsB] = findMatches(FA, FB, DA, DB, rt, N);
         %visualizePoints(imageA, imageB, pointsA, pointsB)
         allPoints = cat(3, pointsA(1:2, :)', pointsB(1:2, :)');
 
