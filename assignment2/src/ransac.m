@@ -27,9 +27,8 @@ function [F, bestModel] = ransac(pointsA, pointsB, t, N)
     bestModel = [];
 
     % Normalize points
-    %[nPointsA, TA] = normalise(pointsA);
-    %[nPointsB, TB] = normalise(pointsB);
-    x = 0;
+    [nPointsA, ~] = normalise(pointsA);
+    [nPointsB, ~] = normalise(pointsB);
 
     for i=0:N,
         % Select eight random points
@@ -39,11 +38,13 @@ function [F, bestModel] = ransac(pointsA, pointsB, t, N)
         Ft = eightPoint(pointsA(:, ids), pointsB(:, ids));
 
         % Compute errors B' * F * A
-        BFtA = sum((pointsB' * Ft).*pointsA', 2)';
-
+        %BFtA = sum((pointsB' * Ft) .* pointsA', 2)';
+        BFtA = sum((nPointsB' * Ft) .* nPointsA', 2)';
         % Compute distances
-        FtA = Ft * pointsA;
-        FtB = Ft' * pointsB;
+        %FtA = Ft * pointsA;
+        %FtB = Ft' * pointsB;
+        FtA = Ft * nPointsA;
+        FtB = Ft' * nPointsB;
 
         distance = BFtA.^2 ./ (FtA(1, :).^2 + FtA(2, :).^2 + FtB(1, :).^2 + FtB(1, :).^2);
 
