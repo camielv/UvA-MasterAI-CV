@@ -36,7 +36,7 @@ function [Z] = chaining(path, rt, N, bt, noLoop)
             Z(matches, :, end) = allPoints(ids(matches), :, 2);
             
             % Remove points that have a track.
-            visualizePoints(imageA, imageB, allPoints(ids(matches), :, 1), allPoints(ids(matches), :, 2));
+            % visualizePoints(imageA, imageB, allPoints(ids(matches), :, 1), allPoints(ids(matches), :, 2));
             ids = unique(ids(matches));
             noIds = setdiff(1:size(allPoints, 1), ids);
             allPoints = allPoints(noIds, :, :);
