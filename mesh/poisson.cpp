@@ -24,7 +24,7 @@ int main (int argc, char** argv) {
     poisson.setSolverDivide( 8 );
     poisson.setIsoDivide( 8 );
     poisson.setPointWeight( 4.0f ); 
-    poisson.setScale( 1.25 );
+    poisson.setScale( 1.5 );
     poisson.setInputCloud( cloud ); 
 
     // Perform reconstruction
