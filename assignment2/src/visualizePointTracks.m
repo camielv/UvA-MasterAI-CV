@@ -3,6 +3,5 @@ function [result] = visualizePointTracks(Z)
     for i = 1 : size(Z, 3),
         result(i, :) = ismember(Z(:, :, i), [-1, -1], 'rows');
     end
-    result = ~result;
     imshow(result);
 end
