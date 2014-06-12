@@ -21,19 +21,27 @@ int main (int argc, char** argv) {
     }
 
     // Read point cloud and normals
-    PCLPointCloud2::Ptr cloud_blob (new PCLPointCloud2);
-    io::loadPCDFile( argv[1], *cloud_blob );
-    PointCloud<PointNormal>::Ptr cloud( new PointCloud<PointNormal>() );
-    fromPCLPointCloud2 (*cloud_blob, *cloud);
+    pcl::PCLPointCloud2::Ptr cloud_blob( new pcl::PCLPointCloud2 );
+    pcl::io::loadPCDFile( argv[1], *cloud_blob );
+    pcl::PointCloud<pcl::PointNormal>::Ptr cloud( new pcl::PointCloud<pcl::PointNormal>() );
+    pcl::fromPCLPointCloud2( *cloud_blob, *cloud );
 
-    // Apply poisson
-    Poisson<PointNormal> poisson;
-    poisson.setDepth( 10 );
+    // Setup poisson
+    pcl::Poisson<pcl::PointNormal> poisson;
+
+    // Setting the parameters
+    poisson.setDepth( 12 );
+    poisson.setSolverDivide( 8 );
+    poisson.setIsoDivide( 8 );
+    poisson.setPointWeight( 4.0f ); 
+    poisson.setScale( 1.25 );
     poisson.setInputCloud( cloud ); 
-    PolygonMesh mesh;
-    poisson.reconstruct ( mesh );
 
-    pcl::io::savePLYFile(argv[2], mesh);
+    // Perform reconstruction
+    pcl::PolygonMesh mesh;
+    poisson.performReconstruction ( mesh );
+
+    pcl::io::saveVTKFile(argv[2], mesh);
 
     // Finish
     return 1;
