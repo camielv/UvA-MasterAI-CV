@@ -2,18 +2,21 @@ Setup
 =====
 
 Since we use the kd implementation of the library FLANN, the user needs to setup
-that library before using this code. You can download FLANN from [here](http://www.cs.ubc.ca/research/flann/).
+that library before using this code. You MUST use the GitHub version of FLANN!!
+You can download it by running:
 
-Once built, the library needs to be installed with `sudo make install`. Finally,
-the path where the installation put the MATLAB files needs to be added to the
-MATLAB path. In our case, this directory was
+    git clone git://github.com/mariusmuja/flann.git
+
+Once built, the library needs to be installed with `sudo make install`, or, even
+better, `sudo checkinstall`. Note that these steps are not included in our
+Makefile since we would like you to understand that this step installs software
+on your computer.
+
+Finally, the path where the installation put the MATLAB files needs to be added
+to the MATLAB path. In our case, this directory was
 
     /usr/local/share/flann/matlab
 
-You can add it in MATLAB with the command `addpath`.
-
-Improvements
-============
-
-- Sampling: Use normal sampling instead of random sampling. So that you take more valuable points
-- Merging: Use error measure to see whether certain points should be merge.
+You can add it in MATLAB with the command `addpath`. Calling the script
+`assignment1.m` automatically adds this path, so you need this step only if you
+installed FLANN somewhere else.
