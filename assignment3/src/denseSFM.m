@@ -1,4 +1,4 @@
-% The sfm function applies the structure from motion algorithm on a dense 
+% The sfm function applies the structure from motion algorithm on a dense
 % set of given measurements.
 %
 % Arguments:
