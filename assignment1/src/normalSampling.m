@@ -17,8 +17,8 @@ function [sampledIDs] = normalSampling(cloudName, originalIDs, nSamples, nBins)
 
     % Find bin for each normal.
     binsX = floor(validNormals(:, 1) / dx) + 1 + ceil(1/dx); binsX(binsX == nBinsX + 1) = nBinsX;
-    binsY = floor(validNormals(:, 2) / dy) + 1 + ceil(1/dy); binsX(binsY == nBinsY + 1) = nBinsY;
-    binsZ = floor(validNormals(:, 3) / dz) + 1 + ceil(1/dz); binsX(binsZ == nBinsZ + 1) = nBinsZ;
+    binsY = floor(validNormals(:, 2) / dy) + 1 + ceil(1/dy); binsY(binsY == nBinsY + 1) = nBinsY;
+    binsZ = floor(validNormals(:, 3) / dz) + 1 + ceil(1/dz); binsZ(binsZ == nBinsZ + 1) = nBinsZ;
 
     % Find count for each bin
     bins = [binsX, binsY, binsZ];
