@@ -6,13 +6,15 @@ function [Z] = chaining(path, rt, N, bt, noLoop)
     nFiles = size(filenames, 2);
     
     Z = zeros(0, 2, 2);
+    
+    peakTresh = 4;
 
     imageA = loadGrayImage(filenames{1});
     imageB = loadGrayImage(filenames{2});
     [imageAcut] = removeBackground(imageA, imageB, bt);
     imageAcut = single(imageAcut);
-    [FA, DA] = vl_sift(imageAcut);
-    
+    [FA, DA] = vl_sift(imageAcut, 'PeakThresh', peakTresh);
+
     for i = 1 : nFiles - noLoop,
         imageB = loadGrayImage(filenames{mod(i, nFiles) + 1});
         
@@ -21,7 +23,7 @@ function [Z] = chaining(path, rt, N, bt, noLoop)
         imageBcut = single(imageBcut);
     
         % Compute SIFT features
-        [FB, DB] = vl_sift(imageBcut);
+        [FB, DB] = vl_sift(imageBcut, 'PeakThresh', peakTresh);
         
         % Find features
         [pointsA, pointsB] = findMatches(FA, FB, DA, DB, rt, N);
@@ -35,11 +37,17 @@ function [Z] = chaining(path, rt, N, bt, noLoop)
             [matches, ids] = ismember(Z(:, :, end - 1), allPoints(:, :, 1), 'rows');
             Z(matches, :, end) = allPoints(ids(matches), :, 2);
             
+            % Visualization
+            [mm, ii] = ismember(allmatch, allPoints(:, :, 1), 'rows');
+            visualizePoints(imageA, imageB, allPoints(ii(mm), :, 1), allPoints(ii(mm), :, 2));
+            allmatch = allPoints(ii(mm), :, 2);
+            
             % Remove points that have a track.
-            % visualizePoints(imageA, imageB, allPoints(ids(matches), :, 1), allPoints(ids(matches), :, 2));
             ids = unique(ids(matches));
             noIds = setdiff(1:size(allPoints, 1), ids);
             allPoints = allPoints(noIds, :, :);
+        else
+            allmatch = allPoints(:, :, 2);
         end
         % Add leftover points
         sZ = size(Z);

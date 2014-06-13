@@ -15,10 +15,10 @@ ids = sum(result, 1) == 0;
 Z = Z(ids, :, :);
 
 %% Normalize each timestep
-for i=1:size(Z,1)
+for i=1:size(Z,3)
     % Compute centroid
-    centroid = mean(Z(i, :, :), 3);
-    Z(i, :, :) = bsxfun(@minus, Z(i, :, :), centroid);
+    centroid = mean(Z(:, :, i), 1);
+    Z(:, :, i) = bsxfun(@minus, Z(:, :, i), centroid);
 end
 
 %% Convert to slide representation
@@ -30,4 +30,5 @@ Z = permute(Z, [2,1,3]);
 
 %% Do 3d reconstruction
 [S, M] = denseSFM(Z);
-scatter3(S(1, :), S(2, :), S(3, :));
+figure(1);
+scatter3(-S(3, :), -S(1, :), -S(2, :));

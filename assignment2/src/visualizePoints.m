@@ -1,6 +1,6 @@
 function visualizePoints(imageA, imageB, pointsA, pointsB)
     result = [imageA imageB];
-    figure; clf;
+    figure(2); clf;
     imshow(result);
     hold on;
 
