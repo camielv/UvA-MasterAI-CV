@@ -1,4 +1,5 @@
 function visualizePoints(imageA, imageB, pointsA, pointsB)
+% VISUALIZEPOINTS Shows matching points between two images.
     result = [imageA imageB];
     figure(2); clf;
     imshow(result);

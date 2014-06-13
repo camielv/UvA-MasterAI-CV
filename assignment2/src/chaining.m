@@ -1,7 +1,5 @@
-% This function gives back points that appear in x consecutive frames
-%
-%
 function [Z] = chaining(path, rt, N, bt, noLoop)
+% CHAINING Creates a 4D matrix containing SIFT point tracks.
     filenames = getFilenames(path);
     nFiles = size(filenames, 2);
     
@@ -27,7 +25,7 @@ function [Z] = chaining(path, rt, N, bt, noLoop)
         
         % Find features
         [pointsA, pointsB] = findMatches(FA, FB, DA, DB, rt, N);
-        %visualizePoints(imageA, imageB, pointsA, pointsB)
+
         allPoints = cat(3, pointsA(1:2, :)', pointsB(1:2, :)');
 
         % Check if points are already in Z
