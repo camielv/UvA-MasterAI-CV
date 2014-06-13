@@ -7,7 +7,7 @@ function [Z] = chaining(path, rt, N, bt, noLoop)
     
     Z = zeros(0, 2, 2);
     
-    peakTresh = 4;
+    peakTresh = 0;
 
     imageA = loadGrayImage(filenames{1});
     imageB = loadGrayImage(filenames{2});
@@ -38,16 +38,17 @@ function [Z] = chaining(path, rt, N, bt, noLoop)
             Z(matches, :, end) = allPoints(ids(matches), :, 2);
             
             % Visualization
-            [mm, ii] = ismember(allmatch, allPoints(:, :, 1), 'rows');
-            visualizePoints(imageA, imageB, allPoints(ii(mm), :, 1), allPoints(ii(mm), :, 2));
-            allmatch = allPoints(ii(mm), :, 2);
+            % [mm, ii] = ismember(allmatch, allPoints(:, :, 1), 'rows');
+            % visualizePoints(imageA, imageB, allPoints(ii(mm), :, 1), allPoints(ii(mm), :, 2));
+            % allmatch = allPoints(ii(mm), :, 2);
             
             % Remove points that have a track.
             ids = unique(ids(matches));
             noIds = setdiff(1:size(allPoints, 1), ids);
             allPoints = allPoints(noIds, :, :);
         else
-            allmatch = allPoints(:, :, 2);
+            % Also visualization
+            % allmatch = allPoints(:, :, 2);
         end
         % Add leftover points
         sZ = size(Z);

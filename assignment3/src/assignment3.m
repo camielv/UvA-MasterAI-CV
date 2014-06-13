@@ -31,4 +31,5 @@ Z = permute(Z, [2,1,3]);
 %% Do 3d reconstruction
 [S, M] = denseSFM(Z);
 figure(1);
-scatter3(-S(3, :), -S(1, :), -S(2, :));
+scatter3(-S(3, :), -S(1, :), S(2, :));
+% axis vis3d
