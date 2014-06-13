@@ -1,4 +1,6 @@
 function [sampledIDs] = normalSampling(cloudName, originalIDs, nSamples, nBins)
+% NORMALSAMPLING samples a certain number of points using normal data.
+
     nBinsX = round(nBins^(1/3));
     nBinsY = nBinsX;
     nBinsZ = nBinsX;

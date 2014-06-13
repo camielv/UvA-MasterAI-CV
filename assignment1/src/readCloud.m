@@ -1,4 +1,5 @@
 function [cloud, indexes] = readCloud(cloudName, filter)
+% READCLOUD reads a pcd file and optionally trims it to 3 dimensions.
     cloud = readPcd(['..' filesep 'data' filesep cloudName '.pcd']);
     % Remove 4th dimension
     cloud = cloud(:, 1:3);

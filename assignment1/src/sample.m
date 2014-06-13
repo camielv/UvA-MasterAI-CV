@@ -1,4 +1,5 @@
 function [cloud, sampledCloudIds] = sample(cloudName, method, sampleSize)
+% SAMPLE samples points from a point cloud based on the requested method.
     
     % The original IDs are kept for normal sampling because we need to 
     % discard the normals for the points we have discarded already.

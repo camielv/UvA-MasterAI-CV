@@ -5,19 +5,10 @@ For this assignment we are required to download and compile the VLFeat library t
 - Find Interest Points
 - Match Interest Points
 
-This repository can be downloaded via:
+The repository is automatically cloned by the included Makefile, but we require
+that you build it manually because the building process depends on your MATLAB
+installation folder.
 
-    git clone git://github.com/vlfeat/vlfeat.git
-
-The repository should be compiled via:
+The VLFeat repository should be compiled via:
 
     make MEX=/MATLABdir/bin/mex
-
-To use the library you should run:
-
-    run('/VLFEATdir/toolbox/vl_setup.m');
-
-Data
-====
-
-In order to get required data use the Makefile to download and unzip the required data.
